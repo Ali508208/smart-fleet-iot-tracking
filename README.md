@@ -3,6 +3,13 @@
 > A production-grade, real-time fleet management platform where GPS-enabled IoT devices stream live vehicle location data to a Node.js backend and are visualised on an interactive Angular dashboard.
 
 ---
+# Screen Shots
+<img width="1274" height="888" alt="fleet3" src="https://github.com/user-attachments/assets/c1898764-913c-4612-8b2e-64e10010da08" />
+
+<img width="1277" height="897" alt="iot fllet" src="https://github.com/user-attachments/assets/d310936b-1995-4ddd-ac00-417f8ab07346" />
+
+<img width="1278" height="687" alt="fleet2" src="https://github.com/user-attachments/assets/34e0a10e-d382-4159-af55-1f2d8b305eb1" />
+
 
 ## Architecture
 
