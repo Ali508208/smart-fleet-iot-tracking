@@ -109,7 +109,7 @@ import { MatIconModule } from "@angular/material/icon";
 })
 export class StatsCardComponent {
   @Input() label = "";
-  @Input() value: string | number = 0;
+  @Input() value: string | number | null = 0;
   @Input() unit = "";
   @Input() icon = "info";
   @Input() color = "#3b82f6";

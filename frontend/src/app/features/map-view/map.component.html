@@ -65,11 +65,11 @@
                 <div class="route-stats">
                     <div class="route-stat">
                         <span>First point</span>
-                        <strong>{{ routeHistory[routeHistory.length - 1]?.timestamp | date:'HH:mm' }}</strong>
+                        <strong>{{ routeHistory.at(-1)?.timestamp | date:'HH:mm' }}</strong>
                     </div>
                     <div class="route-stat">
                         <span>Last point</span>
-                        <strong>{{ routeHistory[0]?.timestamp | date:'HH:mm' }}</strong>
+                        <strong>{{ routeHistory.at(0)?.timestamp | date:'HH:mm' }}</strong>
                     </div>
                 </div>
             </div>
