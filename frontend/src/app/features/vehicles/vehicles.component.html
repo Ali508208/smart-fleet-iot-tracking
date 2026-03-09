@@ -1,0 +1,258 @@
+<div class="vehicles-container">
+
+    <!-- Header -->
+    <div class="page-header">
+        <div>
+            <h2>Fleet Vehicles</h2>
+            <p>Manage and monitor your registered fleet vehicles</p>
+        </div>
+        <button mat-raised-button color="primary" (click)="showAddForm = !showAddForm">
+            <mat-icon>{{ showAddForm ? 'close' : 'add' }}</mat-icon>
+            {{ showAddForm ? 'Cancel' : 'Register Vehicle' }}
+        </button>
+    </div>
+
+    <!-- Add Vehicle Form -->
+    <div class="add-vehicle-form" *ngIf="showAddForm">
+        <div class="form-header">
+            <mat-icon>directions_car</mat-icon>
+            <h3>Register New Vehicle</h3>
+        </div>
+        <form [formGroup]="addForm" (ngSubmit)="addVehicle()" class="vehicle-form">
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Vehicle ID</mat-label>
+                    <input matInput formControlName="vehicleId" placeholder="e.g. TRUCK-201" />
+                    <mat-hint>Uppercase letters, numbers, and hyphens only</mat-hint>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Vehicle Name</mat-label>
+                    <input matInput formControlName="name" placeholder="e.g. Heavy Hauler Bravo" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Type</mat-label>
+                    <mat-select formControlName="type">
+                        <mat-option value="truck">🚚 Truck</mat-option>
+                        <mat-option value="van">🚐 Van</mat-option>
+                        <mat-option value="car">🚗 Car</mat-option>
+                        <mat-option value="bus">🚌 Bus</mat-option>
+                        <mat-option value="motorcycle">🏍️ Motorcycle</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Driver Name</mat-label>
+                    <input matInput formControlName="driverName" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Driver Phone</mat-label>
+                    <input matInput formControlName="driverPhone" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fuel Efficiency (km/L)</mat-label>
+                    <input matInput type="number" formControlName="fuelEfficiency" />
+                </mat-form-field>
+            </div>
+
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Make</mat-label>
+                    <input matInput formControlName="make" placeholder="e.g. Volvo" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Model</mat-label>
+                    <input matInput formControlName="model" placeholder="e.g. FH16" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Year</mat-label>
+                    <input matInput type="number" formControlName="year" placeholder="2024" />
+                </mat-form-field>
+            </div>
+
+            <div class="form-actions">
+                <button mat-raised-button color="primary" type="submit" [disabled]="addForm.invalid">
+                    <mat-icon>check</mat-icon> Register Vehicle
+                </button>
+                <button mat-button type="button" (click)="showAddForm = false">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Main Content: Table + Detail Panel -->
+    <div class="content-layout">
+
+        <!-- Vehicles Table -->
+        <div class="table-panel">
+            <div class="loading-box" *ngIf="loading">
+                <mat-spinner diameter="40"></mat-spinner>
+            </div>
+
+            <table mat-table [dataSource]="vehicles" class="fleet-table" *ngIf="!loading">
+
+                <ng-container matColumnDef="vehicleId">
+                    <th mat-header-cell *matHeaderCellDef>Vehicle ID</th>
+                    <td mat-cell *matCellDef="let v">
+                        <span class="vehicle-id">{{ getTypeIcon(v.type) }} {{ v.vehicleId }}</span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Name</th>
+                    <td mat-cell *matCellDef="let v">{{ v.name }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="type">
+                    <th mat-header-cell *matHeaderCellDef>Type</th>
+                    <td mat-cell *matCellDef="let v">
+                        <span class="type-chip">{{ v.type | titlecase }}</span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="driver">
+                    <th mat-header-cell *matHeaderCellDef>Driver</th>
+                    <td mat-cell *matCellDef="let v">{{ v.driver?.name || '—' }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef>Status</th>
+                    <td mat-cell *matCellDef="let v">
+                        <div class="status-chip" [style.--status-color]="statusColor(v.status)">
+                            <span class="status-dot"></span>
+                            {{ v.status | uppercase }}
+                        </div>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="speed">
+                    <th mat-header-cell *matHeaderCellDef>Speed</th>
+                    <td mat-cell *matCellDef="let v">
+                        {{ (v.lastLocation?.speed || 0) | number:'1.0-0' }} km/h
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="distance">
+                    <th mat-header-cell *matHeaderCellDef>Today</th>
+                    <td mat-cell *matCellDef="let v">
+                        {{ (v.todayDistance || 0) | number:'1.1-1' }} km
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef>Actions</th>
+                    <td mat-cell *matCellDef="let v">
+                        <button mat-icon-button (click)="selectVehicle(v)" matTooltip="View analytics">
+                            <mat-icon>analytics</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" (click)="deleteVehicle(v.vehicleId)"
+                            matTooltip="Delete vehicle">
+                            <mat-icon>delete_outline</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                    [class.selected-row]="selectedVehicle?.vehicleId === row.vehicleId" (click)="selectVehicle(row)">
+                </tr>
+            </table>
+
+            <div class="no-vehicles" *ngIf="!loading && vehicles.length === 0">
+                <mat-icon>local_shipping</mat-icon>
+                <p>No vehicles registered yet</p>
+                <button mat-raised-button color="primary" (click)="showAddForm = true">Register First Vehicle</button>
+            </div>
+        </div>
+
+        <!-- Analytics Panel -->
+        <div class="analytics-panel" *ngIf="selectedVehicle">
+            <div class="analytics-header">
+                <div>
+                    <h3>{{ selectedVehicle.vehicleId }}</h3>
+                    <span class="analytics-sub">{{ selectedVehicle.name }}</span>
+                </div>
+                <button mat-icon-button (click)="selectedVehicle = null">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
+
+            <div class="loading-box" *ngIf="analyticsLoading">
+                <mat-spinner diameter="32"></mat-spinner>
+            </div>
+
+            <ng-container *ngIf="analytics && !analyticsLoading">
+                <div class="analytics-grid">
+                    <div class="analytics-metric">
+                        <mat-icon>route</mat-icon>
+                        <div class="metric-value">{{ analytics.totalDistance | number:'1.1-1' }}</div>
+                        <div class="metric-label">km Distance</div>
+                    </div>
+                    <div class="analytics-metric">
+                        <mat-icon>speed</mat-icon>
+                        <div class="metric-value">{{ analytics.averageSpeed | number:'1.0-0' }}</div>
+                        <div class="metric-label">km/h Avg Speed</div>
+                    </div>
+                    <div class="analytics-metric peak">
+                        <mat-icon>trending_up</mat-icon>
+                        <div class="metric-value">{{ analytics.maxSpeed | number:'1.0-0' }}</div>
+                        <div class="metric-label">km/h Max Speed</div>
+                    </div>
+                    <div class="analytics-metric">
+                        <mat-icon>timer</mat-icon>
+                        <div class="metric-value">{{ analytics.travelTime }}</div>
+                        <div class="metric-label">min Travel Time</div>
+                    </div>
+                    <div class="analytics-metric idle">
+                        <mat-icon>pause_circle</mat-icon>
+                        <div class="metric-value">{{ analytics.idleTime }}</div>
+                        <div class="metric-label">min Idle Time</div>
+                    </div>
+                    <div class="analytics-metric fuel">
+                        <mat-icon>local_gas_station</mat-icon>
+                        <div class="metric-value">{{ analytics.fuelEstimate | number:'1.1-1' }}</div>
+                        <div class="metric-label">L Fuel Est.</div>
+                    </div>
+                </div>
+
+                <div class="vehicle-info-section">
+                    <h4>Vehicle Info</h4>
+                    <div class="info-row" *ngIf="selectedVehicle.specs?.make">
+                        <span>Make/Model</span>
+                        <strong>{{ selectedVehicle.specs?.make }} {{ selectedVehicle.specs?.model }}</strong>
+                    </div>
+                    <div class="info-row" *ngIf="selectedVehicle.specs?.year">
+                        <span>Year</span>
+                        <strong>{{ selectedVehicle.specs?.year }}</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>Total Distance</span>
+                        <strong>{{ selectedVehicle.totalDistance | number:'1.1-1' }} km</strong>
+                    </div>
+                    <div class="info-row" *ngIf="selectedVehicle.lastActive">
+                        <span>Last Active</span>
+                        <strong>{{ selectedVehicle.lastActive | date:'short' }}</strong>
+                    </div>
+                </div>
+
+                <div class="driver-section" *ngIf="selectedVehicle.driver?.name">
+                    <h4>Driver</h4>
+                    <div class="driver-card">
+                        <mat-icon>person</mat-icon>
+                        <div>
+                            <div class="driver-name">{{ selectedVehicle.driver?.name }}</div>
+                            <div class="driver-phone">{{ selectedVehicle.driver?.phone || 'No phone' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+
+    </div>
+</div>

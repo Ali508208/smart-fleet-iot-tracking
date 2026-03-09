@@ -1,0 +1,262 @@
+.dashboard-container {
+  padding: 24px;
+  min-height: calc(100vh - 60px);
+  position: relative;
+}
+
+/* ── Loading ── */
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  gap: 16px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* ── Stats Grid ── */
+.stats-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* ── Main Dashboard Grid ── */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ── Panels ── */
+.vehicles-panel,
+.panel {
+  background: #161b27;
+  border: 1px solid #1e2d45;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #1e2d45;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #e2e8f0;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: #64748b;
+    }
+  }
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.badge-green {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.badge-red {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-amber {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.view-map-btn {
+  font-size: 13px;
+  color: #3b82f6 !important;
+}
+
+/* ── Vehicle Lists ── */
+.vehicles-list {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+/* ── Right Column ── */
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.offline-panel .vehicles-list {
+  max-height: 200px;
+}
+
+/* ── Alerts ── */
+.alerts-panel {
+  .alerts-list {
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
+.alert-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+
+  &.alert-enter {
+    background: rgba(34, 197, 94, 0.08);
+    border-left-color: #22c55e;
+    .alert-icon mat-icon {
+      color: #22c55e;
+    }
+  }
+
+  &.alert-exit {
+    background: rgba(239, 68, 68, 0.08);
+    border-left-color: #ef4444;
+    .alert-icon mat-icon {
+      color: #ef4444;
+    }
+  }
+
+  &.alert-info {
+    background: rgba(59, 130, 246, 0.08);
+    border-left-color: #3b82f6;
+    .alert-icon mat-icon {
+      color: #3b82f6;
+    }
+  }
+}
+
+.alert-icon mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.alert-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.alert-desc {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.alert-time {
+  font-size: 11px;
+  color: #475569;
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Empty States ── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 8px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #334155;
+  }
+
+  p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  span {
+    font-size: 12px;
+    color: #374151;
+  }
+
+  &.small {
+    padding: 24px;
+
+    mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+  }
+}
+
+/* ── Footer ── */
+.dashboard-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding: 12px 0;
+  border-top: 1px solid #1e2d45;
+  font-size: 12px;
+  color: #475569;
+}
+
+.refresh-btn {
+  color: #3b82f6 !important;
+  font-size: 13px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e2d45;
+  border-radius: 2px;
+}

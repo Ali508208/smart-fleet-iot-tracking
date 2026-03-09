@@ -1,0 +1,92 @@
+<div class="map-view-container">
+
+    <!-- Vehicle Sidebar -->
+    <aside class="vehicle-sidebar">
+        <div class="sidebar-header">
+            <h3>Fleet Vehicles</h3>
+            <span class="update-badge">{{ updateCount }} updates</span>
+        </div>
+
+        <div class="vehicle-sidebar-list">
+            <div class="sidebar-vehicle-item" *ngFor="let vehicle of vehicles"
+                [class.selected]="selectedVehicle?.vehicleId === vehicle.vehicleId"
+                (click)="selectVehicle(vehicle.vehicleId)">
+
+                <div class="svi-indicator" [style.background]="statusColor(vehicle.status)"></div>
+                <div class="svi-info">
+                    <div class="svi-id">{{ vehicle.vehicleId }}</div>
+                    <div class="svi-name">{{ vehicle.name }}</div>
+                    <div class="svi-speed" *ngIf="vehicle.lastLocation">
+                        {{ vehicle.lastLocation.speed }} km/h &bull; {{ vehicle.status }}
+                    </div>
+                </div>
+                <mat-icon class="svi-arrow">chevron_right</mat-icon>
+            </div>
+        </div>
+
+        <!-- Selected vehicle details -->
+        <div class="vehicle-detail-panel" *ngIf="selectedVehicle">
+            <div class="detail-header">
+                <h4>{{ selectedVehicle.vehicleId }}</h4>
+                <button mat-icon-button (click)="clearSelection()">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
+            <div class="detail-body">
+                <div class="detail-row">
+                    <span>Name</span><strong>{{ selectedVehicle.name }}</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Driver</span><strong>{{ selectedVehicle.driver?.name || 'N/A' }}</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Type</span><strong>{{ selectedVehicle.type | titlecase }}</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Speed</span>
+                    <strong>{{ selectedVehicle.lastLocation?.speed || 0 }} km/h</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Distance Today</span>
+                    <strong>{{ selectedVehicle.todayDistance | number:'1.1-1' }} km</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Status</span>
+                    <strong [style.color]="statusColor(selectedVehicle.status)">
+                        {{ selectedVehicle.status | uppercase }}
+                    </strong>
+                </div>
+            </div>
+            <div class="route-history-section" *ngIf="routeHistory.length > 0">
+                <div class="route-history-header">
+                    <mat-icon>route</mat-icon>
+                    Route History ({{ routeHistory.length }} points)
+                </div>
+                <div class="route-stats">
+                    <div class="route-stat">
+                        <span>First point</span>
+                        <strong>{{ routeHistory[routeHistory.length - 1]?.timestamp | date:'HH:mm' }}</strong>
+                    </div>
+                    <div class="route-stat">
+                        <span>Last point</span>
+                        <strong>{{ routeHistory[0]?.timestamp | date:'HH:mm' }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fit all button -->
+        <div class="sidebar-bottom">
+            <button mat-stroked-button (click)="fitAllVehicles()" class="fit-btn">
+                <mat-icon>zoom_out_map</mat-icon>
+                Fit All Vehicles
+            </button>
+        </div>
+    </aside>
+
+    <!-- Map Container -->
+    <div class="map-wrapper">
+        <div #mapContainer class="leaflet-map"></div>
+    </div>
+
+</div>

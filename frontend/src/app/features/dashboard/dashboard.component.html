@@ -1,0 +1,137 @@
+<div class="dashboard-container">
+
+    <!-- Loading state -->
+    <div class="loading-overlay" *ngIf="loading">
+        <mat-spinner diameter="48"></mat-spinner>
+        <p>Loading fleet data...</p>
+    </div>
+
+    <ng-container *ngIf="!loading">
+
+        <!-- Stats Grid -->
+        <section class="stats-section">
+            <app-stats-card label="Total Vehicles" [value]="stats?.totalVehicles ?? 0" icon="local_shipping"
+                color="#3b82f6" subtitle="Fleet registered">
+            </app-stats-card>
+
+            <app-stats-card label="Active Now" [value]="stats?.activeVehicles ?? 0" icon="gps_fixed" color="#22c55e"
+                subtitle="Online vehicles">
+            </app-stats-card>
+
+            <app-stats-card label="Idle" [value]="stats?.idleVehicles ?? 0" icon="pause_circle" color="#f59e0b"
+                subtitle="Stationary vehicles">
+            </app-stats-card>
+
+            <app-stats-card label="Offline" [value]="stats?.offlineVehicles ?? 0" icon="signal_wifi_off" color="#ef4444"
+                subtitle="No signal">
+            </app-stats-card>
+
+            <app-stats-card label="Distance Today" [value]="(stats?.totalDistanceToday ?? 0) | number:'1.0-1'" unit="km"
+                icon="route" color="#8b5cf6" subtitle="Total fleet distance">
+            </app-stats-card>
+
+            <app-stats-card label="Avg Speed" [value]="(stats?.averageSpeed ?? 0) | number:'1.0-0'" unit="km/h"
+                icon="speed" color="#06b6d4" subtitle="Fleet average">
+            </app-stats-card>
+        </section>
+
+        <!-- Active Vehicles + Alerts Row -->
+        <section class="dashboard-grid">
+
+            <!-- Active Vehicles -->
+            <div class="vehicles-panel">
+                <div class="panel-header">
+                    <h2>
+                        <mat-icon>directions_car</mat-icon>
+                        Active Vehicles
+                        <span class="badge badge-green">{{ getActiveVehicles().length }}</span>
+                    </h2>
+                    <a mat-button routerLink="/map" color="primary" class="view-map-btn">
+                        <mat-icon>map</mat-icon>
+                        Open Map
+                    </a>
+                </div>
+
+                <div class="vehicles-list" *ngIf="getActiveVehicles().length > 0; else noActive">
+                    <app-vehicle-card *ngFor="let vehicle of getActiveVehicles()" [vehicle]="vehicle">
+                    </app-vehicle-card>
+                </div>
+
+                <ng-template #noActive>
+                    <div class="empty-state">
+                        <mat-icon>gps_off</mat-icon>
+                        <p>No active vehicles</p>
+                        <span>Start the GPS simulator to see vehicles online</span>
+                    </div>
+                </ng-template>
+            </div>
+
+            <!-- Right column: Offline + Alerts -->
+            <div class="right-column">
+
+                <!-- Offline Vehicles -->
+                <div class="panel offline-panel" *ngIf="getOfflineVehicles().length > 0">
+                    <div class="panel-header">
+                        <h2>
+                            <mat-icon>wifi_off</mat-icon>
+                            Offline / Maintenance
+                            <span class="badge badge-red">{{ getOfflineVehicles().length }}</span>
+                        </h2>
+                    </div>
+                    <div class="vehicles-list">
+                        <app-vehicle-card *ngFor="let vehicle of getOfflineVehicles()" [vehicle]="vehicle">
+                        </app-vehicle-card>
+                    </div>
+                </div>
+
+                <!-- Alerts Panel -->
+                <div class="panel alerts-panel">
+                    <div class="panel-header">
+                        <h2>
+                            <mat-icon>notifications_active</mat-icon>
+                            Live Alerts
+                            <span class="badge badge-amber" *ngIf="alerts.length > 0">{{ alerts.length }}</span>
+                        </h2>
+                        <button mat-icon-button *ngIf="alerts.length > 0" (click)="clearAlerts()"
+                            matTooltip="Clear alerts">
+                            <mat-icon>clear_all</mat-icon>
+                        </button>
+                    </div>
+
+                    <div class="alerts-list" *ngIf="alerts.length > 0; else noAlerts">
+                        <div class="alert-item" *ngFor="let alert of alerts" [ngClass]="getAlertClass(alert.type)">
+                            <div class="alert-icon">
+                                <mat-icon>{{ alert.type.includes('ENTER') ? 'login' : 'logout' }}</mat-icon>
+                            </div>
+                            <div class="alert-body">
+                                <div class="alert-title">{{ alert.vehicleId }}</div>
+                                <div class="alert-desc">
+                                    {{ alert.type === 'GEOFENCE_ENTER' ? 'Entered' : 'Exited' }}
+                                    geofence: <strong>{{ alert.fenceName }}</strong>
+                                </div>
+                                <div class="alert-time">{{ alert.timestamp | date:'HH:mm:ss' }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ng-template #noAlerts>
+                        <div class="empty-state small">
+                            <mat-icon>notifications_none</mat-icon>
+                            <p>No alerts</p>
+                        </div>
+                    </ng-template>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <div class="dashboard-footer">
+            <span>Last updated: {{ lastUpdated | date:'HH:mm:ss' }}</span>
+            <button mat-button (click)="loadData()" class="refresh-btn">
+                <mat-icon>refresh</mat-icon> Refresh
+            </button>
+        </div>
+
+    </ng-container>
+</div>
